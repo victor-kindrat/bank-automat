@@ -5,6 +5,24 @@
   font-family: "Kanit", "Montserrat", sans-serif;
 }
 
+.wrap .form .form__button, .wrap .helloPage .helloPage__button {
+  padding: 15px 25px;
+  border-radius: 25px;
+  background: rgb(128, 58, 0);
+  color: #ffffff;
+  border: none;
+  font-size: 20px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+  border: 1px solid transparent;
+}
+.wrap .form .form__button:hover, .wrap .helloPage .helloPage__button:hover {
+  background-color: #ffffff;
+  border: 1px solid rgb(128, 58, 0);
+  color: rgb(128, 58, 0);
+}
+
 div[data-hidden=true] {
   display: none !important;
 }
@@ -55,22 +73,23 @@ div[data-hidden=true] {
   justify-content: center;
   gap: 25px;
 }
-.wrap .helloPage .helloPage__button {
-  padding: 15px 25px;
-  border-radius: 25px;
-  background: rgb(128, 58, 0);
-  color: #ffffff;
-  border: none;
-  font-size: 20px;
-  line-height: 20px;
-  cursor: pointer;
-  transition: 0.3s;
-  border: 1px solid transparent;
+.wrap .form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
 }
-.wrap .helloPage .helloPage__button:hover {
-  background-color: #ffffff;
-  border: 1px solid rgb(128, 58, 0);
+.wrap .form .headline__subheadline {
   color: rgb(128, 58, 0);
+}
+.wrap .form .form__input {
+  border: 1px solid rgb(128, 58, 0);
+  padding: 10px 25px;
+  border-radius: 25px;
+  font-size: 18px;
+  outline: none;
+  line-height: 18px;
 }
 
 /*# sourceMappingURL=style.css.map */
