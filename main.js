@@ -127,14 +127,18 @@ $('#passwordSignUp').on('input', function () {
 
 $('#registerBtn').click(function () {
     let exist = false;
-    for (let i = 0; i!== database.length; i++) {
+    for (let i = 0; i !== database.length; i++) {
         if (database[i].name = $('#nameSignUp').val()) {
             exist = true
         }
     }
     if ($('#passwordSignUp').val().length > 8) {
         if (exist) {
-            alert(`⚠ Account with name ${$('#nameSignUp').val()} has already exist\nReload page and log in or try another name`)
+            let confirmLogIn = confirm(`⚠ Account with name ${$('#nameSignUp').val()} has already exist\nTo login press ok. To discard - cancel.`)
+            if (confirmLogIn) {
+                $('.page').attr('data-hidden', 'true');
+                $('.login').attr('data-hidden', 'false');
+            }
         } else {
             let userCandidature = new UserAccount($('#nameSignUp').val(), $('#passwordSignUp').val());
             userCandidature.addCard();
