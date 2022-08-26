@@ -91,6 +91,11 @@ div[data-hidden=true] {
   outline: none;
   line-height: 18px;
 }
+.wrap .form .password-validate {
+  color: rgb(225, 33, 33);
+  font-size: 15px;
+  font-weight: 300;
+}
 .wrap .mainPage {
   display: flex;
   flex-direction: column;

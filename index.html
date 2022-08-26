@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Qwerty bank</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +20,7 @@
 <body>
     <div class="wrap">
         <div class="bank-container">
-            <div class="page helloPage" data-hidden="true">
+            <div class="page helloPage" data-hidden="false">
                 <h2 class="headline__subheadline">Qwerty bank - your favourite bank</h2>
                 <h1 class="headline__main">Qwerty123 bank</h1>
                 <div class="helloPage__row">
@@ -30,8 +31,9 @@
 
             <div class="page form register" data-hidden="true">
                 <h2 class="headline__subheadline">Sign up</h2>
-                <input type="text" placeholder="Full name" class="form__input">
-                <input type="password" placeholder="Create a password" class="form__input">
+                <input type="text" placeholder="Full name" class="form__input" id="nameSignUp">
+                <input type="password" placeholder="Create a password" class="form__input" id="passwordSignUp">
+                <p class="password-validate"></p>
                 <button class="form__button" id="registerBtn">Sign up!</button>
             </div>
 
@@ -42,7 +44,7 @@
                 <button class="form__button" id="loginBtn">Sign in!</button>
             </div>
 
-            <div class="page mainPage">
+            <div class="page mainPage" data-hidden="true">
                 <div class="mainPage__head">
                     <div class="date">
                         <div class="date__clock">

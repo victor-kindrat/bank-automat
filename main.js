@@ -1,10 +1,13 @@
-function userCard(id, userName){
+let database = JSON.parse(localStorage.getItem('database')) || [];
+let activeAccount = {};
+
+function userCard(id, userName) {
     let balance = 100;
     let transactionLimit = 100;
     let historyLogs = [];
     let owner = userName;
 
-    function recordOperation(type, value, time){
+    function recordOperation(type, value, time) {
         historyLogs.push({
             operationType: type,
             credits: value,
@@ -13,25 +16,25 @@ function userCard(id, userName){
     }
 
     return {
-        getCardInformation () {
+        getCardInformation() {
             return {
-                id, 
-                balance, 
-                transactionLimit, 
+                id,
+                balance,
+                transactionLimit,
                 historyLogs,
                 owner
             };
-        }, 
-        putCredits (amount) {
-            if (amount <=transactionLimit) {
+        },
+        putCredits(amount) {
+            if (amount <= transactionLimit) {
                 balance += amount;
                 recordOperation('Recieved credits', amount, new Date());
             } else {
                 console.warn('Exceeded limit')
             }
         },
-        takeCredits (amount) {
-            if (amount <=transactionLimit) {
+        takeCredits(amount) {
+            if (amount <= transactionLimit) {
                 if (balance - amount >= 0) {
                     balance -= amount;
                     recordOperation('Taked credits', amount, new Date());
@@ -49,11 +52,11 @@ function userCard(id, userName){
             } else {
                 console.warn('Your number is to low')
             }
-        }, 
+        },
         transferCredits(amount, card) {
             const tax = 0.005;
             let transfferAmount = amount * tax + amount;
-            if (transfferAmount <= balance && transfferAmount<=transactionLimit) {
+            if (transfferAmount <= balance && transfferAmount <= transactionLimit) {
                 if (transfferAmount <= balance) {
                     this.takeCredits(transfferAmount);
                     card.putCredits(amount);
@@ -82,7 +85,7 @@ class UserAccount {
     }
 
     getCardById(key) {
-        return this.cards[key-1].getCardInformation()
+        return this.cards[key - 1].getCardInformation()
     }
 
     logIn(name, password) {
@@ -106,3 +109,40 @@ console.log(user)
 console.log(user.getCardById(2))
 user.cards[1].takeCredits(40);
 console.log(user.getCardById(2))
+
+$('#signIn').click(function () {
+    $('.page').attr('data-hidden', 'true');
+    $('.login').attr('data-hidden', 'false');
+})
+
+
+$('#signUp').click(function () {
+    $('.page').attr('data-hidden', 'true');
+    $('.register').attr('data-hidden', 'false');
+})
+
+$('#passwordSignUp').on('input', function () {
+    ($('#passwordSignUp').val().length > 0 && $('#passwordSignUp').val().length < 8) ? $('.password-validate').text('Your password has less then 8 chapters'): $('.password-validate').text('');
+})
+
+$('#registerBtn').click(function () {
+    let exist = false;
+    for (let i = 0; i!== database.length; i++) {
+        if (database[i].name = $('#nameSignUp').val()) {
+            exist = true
+        }
+    }
+    if ($('#passwordSignUp').val().length > 8) {
+        if (exist) {
+            alert(`⚠ Account with name ${$('#nameSignUp').val()} has already exist\nReload page and log in or try another name`)
+        } else {
+            let userCandidature = new UserAccount($('#nameSignUp').val(), $('#passwordSignUp').val());
+            userCandidature.addCard();
+            database.push(userCandidature);
+            localStorage.database = JSON.stringify(database)
+            activeAccount = database[database.length - 1];
+            $('.page').attr('data-hidden', 'true');
+            $('.mainPage').attr('data-hidden', 'false');
+        }
+    }
+})
