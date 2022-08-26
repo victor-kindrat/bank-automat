@@ -5,7 +5,7 @@
   font-family: "Kanit", "Montserrat", sans-serif;
 }
 
-.wrap .form .form__button, .wrap .helloPage .helloPage__button {
+.wrap .mainPage .mainPage__btn, .wrap .form .form__button, .wrap .helloPage .helloPage__button {
   padding: 15px 25px;
   border-radius: 25px;
   background: rgb(128, 58, 0);
@@ -17,7 +17,7 @@
   transition: 0.3s;
   border: 1px solid transparent;
 }
-.wrap .form .form__button:hover, .wrap .helloPage .helloPage__button:hover {
+.wrap .mainPage .mainPage__btn:hover, .wrap .form .form__button:hover, .wrap .helloPage .helloPage__button:hover {
   background-color: #ffffff;
   border: 1px solid rgb(128, 58, 0);
   color: rgb(128, 58, 0);
@@ -90,6 +90,50 @@ div[data-hidden=true] {
   font-size: 18px;
   outline: none;
   line-height: 18px;
+}
+.wrap .mainPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 50px;
+}
+.wrap .mainPage .mainPage__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+}
+.wrap .mainPage .mainPage__head .mainPage__btn {
+  background: rgb(225, 33, 33);
+}
+.wrap .mainPage .mainPage__head .mainPage__btn:hover {
+  background: rgb(255, 255, 255);
+}
+.wrap .mainPage .mainPage__btn {
+  padding: 10px 15px;
+  font-size: 16px;
+  line-height: 16px;
+}
+.wrap .mainPage .mainPage__body {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+.wrap .mainPage .mainPage__headline {
+  font-size: 50px;
+  text-align: center;
+}
+.wrap .mainPage .mainPage__row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
 }
 
 /*# sourceMappingURL=style.css.map */
