@@ -1,7 +1,8 @@
-function userCard(id){
+function userCard(id, userName){
     let balance = 100;
     let transactionLimit = 100;
     let historyLogs = [];
+    let owner = userName;
 
     function recordOperation(type, value, time){
         historyLogs.push({
@@ -17,7 +18,8 @@ function userCard(id){
                 id, 
                 balance, 
                 transactionLimit, 
-                historyLogs
+                historyLogs,
+                owner
             };
         }, 
         putCredits (amount) {
@@ -25,7 +27,7 @@ function userCard(id){
                 balance += amount;
                 recordOperation('Recieved credits', amount, new Date());
             } else {
-                console.log('Exceeded limit')
+                console.warn('Exceeded limit')
             }
         },
         takeCredits (amount) {
@@ -34,10 +36,10 @@ function userCard(id){
                     balance -= amount;
                     recordOperation('Taked credits', amount, new Date());
                 } else {
-                    console.log('No enought money')
+                    console.warn('No enought money')
                 }
             } else {
-                console.log('Exceeded limit')
+                console.warn('Exceeded limit')
             }
         },
         setTransactionLimit(amount) {
@@ -45,7 +47,7 @@ function userCard(id){
                 transactionLimit = amount;
                 recordOperation('Change transaction limit', amount, new Date());
             } else {
-                console.log('Your number is to low')
+                console.warn('Your number is to low')
             }
         }, 
         transferCredits(amount, card) {
@@ -56,7 +58,7 @@ function userCard(id){
                     this.takeCredits(transfferAmount);
                     card.putCredits(amount);
                 } else {
-                    console.log('Not enought money')
+                    console.warn('Not enought money')
                 }
             }
         }
@@ -64,22 +66,27 @@ function userCard(id){
 }
 
 class UserAccount {
-    constructor(name) {
+    constructor(name, password) {
         this.name = name;
+        this.password = password
         this.cards = [];
         this.limit = 3;
     }
 
     addCard() {
         if (this.cards.length < this.limit) {
-            this.cards.push(userCard(this.cards.length + 1))
+            this.cards.push(userCard(this.cards.length + 1, this.name))
         } else {
-            console.log('You have more than 3 cards')
+            console.warn('You have more than 3 cards')
         }
     }
 
     getCardById(key) {
         return this.cards[key-1].getCardInformation()
+    }
+
+    logIn(name, password) {
+        return name === this.name && password === this.password
     }
 }
 
@@ -88,3 +95,14 @@ let card1 = userCard(1);
 console.log(card1.getCardInformation())
 card1.putCredits(50)
 console.log(card1.getCardInformation())
+
+let user = new UserAccount('Victor', 'qwerty123');
+console.log(user)
+user.addCard()
+user.addCard()
+user.addCard()
+user.addCard()
+console.log(user)
+console.log(user.getCardById(2))
+user.cards[1].takeCredits(40);
+console.log(user.getCardById(2))

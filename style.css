@@ -4,4 +4,29 @@
   box-sizing: border-box;
 }
 
+.wrap {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(4, 92, 4);
+}
+.wrap .bank-container {
+  width: 90%;
+  height: 90%;
+  border: 50px #cecece groove;
+  background: #ffffff;
+}
+.wrap .page {
+  width: 100%;
+  height: 100%;
+}
+.wrap .helloPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
 /*# sourceMappingURL=style.css.map */
