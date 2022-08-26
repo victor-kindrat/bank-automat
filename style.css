@@ -11,6 +11,7 @@
   align-items: center;
   justify-content: center;
   background: rgb(4, 92, 4);
+  user-select: none;
 }
 .wrap .bank-container {
   width: 90%;
