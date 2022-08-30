@@ -167,6 +167,7 @@ $('#loginBtn').click(function () {
         if (database[i].name === $('#loginLogin').val()) {
             exist = true;
             user = database[i]
+            activeAccount.id = i + 1;
         }
     }
     if (exist) {
@@ -205,11 +206,11 @@ $('#getMoneyBtn').click(function () {
             if (cardId <= database[i].cards.length) {
                 let about = database[i].getCardById(cardId);
                 let amount = prompt(`Input the amount of credits to get. This card's limit is ${about.transactionLimit}`, about.transactionLimit)
-                if (amount < about.transactionLimit && about.balance - amount >= 0) {
+                if (amount <= about.transactionLimit && about.balance - amount >= 0) {
                     database[i].cards[cardId - 1].takeCredits(parseInt(amount))
                     about = database[i].getCardById(cardId)
                     alert(`Success! Your ballance on card ${cardId} is ${about.balance}`)
-                } else if (about.balance - amount <= 0){
+                } else if (about.balance - amount < 0){
                     alert('No enough money')
                 } else {
                     alert('Exceeded limit')
@@ -219,7 +220,9 @@ $('#getMoneyBtn').click(function () {
             }
         }
     }
-    activeAccount = database[activeAccount.id - 1];
+    let id = activeAccount.id;
+    activeAccount = database[id];
+    activeAccount.id = id
 })
 
 $('#putMoneyBtn').click(function () {
@@ -241,7 +244,9 @@ $('#putMoneyBtn').click(function () {
             }
         }
     }
-    activeAccount = database[activeAccount.id - 1];
+    let id = activeAccount.id;
+    activeAccount = database[id];
+    activeAccount.id = id
 })
 
 $('#transferBtn').click(function(){
@@ -259,13 +264,45 @@ $('#transferBtn').click(function(){
     }
     if (finded) {
         let cardId = parseInt(prompt(`To which ${foundedUser.name}'s card you want to transeft?\nHe(She) has got a ${foundedUser.cards.length} card(s)`, 1));
-        let usersCardId = parseInt(prompt(`From which your card you want to transeft?\nYou have got a ${activeAccount.cards.length} card(s)`, 1));
-        let myCard = database[activeAccount.id - 1].getCardById(cardId);
-        console.log(id)
-        let usersCard = database[foundedUser.id - 1].getCardById(usersCardId);
-        let summa = parseInt(prompt(`Ok. You choosed ${cardId} card.\n💰How much money do you want to transfer?\nNote: your transaction limit is ${myCard.transactionLimit}`, myCard.transactionLimit))
+        if (cardId <= foundedUser.cards.length) {
+            let usersCardId = parseInt(prompt(`From which your card you want to transeft?\nYou have got a ${activeAccount.cards.length} card(s)`, 1));
+            if (usersCardId <= activeAccount.cards.length) {
+                let myCard = database[activeAccount.id - 1].getCardById(cardId);
+                let usersCard = database[foundedUser.id - 1].getCardById(usersCardId);
+                let summa = parseInt(prompt(`Ok. You choosed ${cardId} card.\n💰How much money do you want to transfer?\nNote: your transaction limit is ${myCard.transactionLimit}`, myCard.transactionLimit))
+                if (summa <= myCard.transactionLimit) {
+                    if (myCard.balance - summa >= 0) {
+                        database[activeAccount.id - 1].cards[usersCardId - 1].transferCredits(summa, database[foundedUser.id - 1].cards[cardId - 1]);
+                        let newInfo = database[activeAccount.id - 1].cards[usersCardId - 1].getCardInformation()
+                        alert(`💸 Transfer successful!\nYou send ${summa}$ to ${foundedUser.name} and your current ballance on this card is ${newInfo.balance}$`);
+                    } else {
+                        alert(`You haven't enough money`)
+                    }
+                } else {
+                    alert('Exceed limit')
+                }
+            } else {
+                alert(`You haven't got a card with ${usersCardId}`);
+            }
+        } else {
+            alert(`${foundedUser.name} hasn't got a card with id ${cardId}`)
+        }
     } else {
         alert(`User with name ${userName} is not finded! Please check the name and try again.`)
     }
+    let actid = activeAccount.id;
     activeAccount = database[activeAccount.id - 1];
+    activeAccount.id = actid
+});
+
+$('#historyBtn').click(function(){
+    toastList[0].show();
+    $('.toast-body').empty();
+    for (card of activeAccount.cards) {
+        let cardInfo = card.getCardInformation();
+        for(historyLog of cardInfo.historyLogs) {
+            let hourly = new Date(historyLog.operationTime).toTimeString().slice(0, new Date(historyLog.operationTime).toTimeString().lastIndexOf(':'))
+            $('.toast-body').prepend(`<div class="text fs-5"><span class="badge text-bg-primary">${new Date(historyLog.operationTime).toDateString()}, ${hourly}</span> - ${historyLog.operationType}, ${historyLog.credits}$ on card ${cardInfo.id}</div>`)
+        }
+    }
 })
