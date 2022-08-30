@@ -1,4 +1,5 @@
-let database = JSON.parse(localStorage.getItem('database')) || [];
+let database = [];
+// JSON.parse(localStorage.getItem('database'))
 let activeAccount = {};
 let x;
 
@@ -56,7 +57,7 @@ function userCard(id, userName) {
                     balance -= amount;
                     recordOperation('Taked credits', amount, new Date());
                 } else {
-                    console.warn('No enought money')
+                    console.warn('No enough money')
                 }
             } else {
                 console.warn('Exceeded limit')
@@ -78,54 +79,35 @@ function userCard(id, userName) {
                     this.takeCredits(transfferAmount);
                     card.putCredits(amount);
                 } else {
-                    console.warn('Not enought money')
+                    console.warn('Not enough money')
                 }
             }
         }
     }
 }
 
-class UserAccount {
-    constructor(name, password) {
-        this.name = name;
-        this.password = password
-        this.cards = [];
-        this.limit = 3;
-    }
+function UserAccount(name, password) {
+    this.name = name;
+    this.password = password
+    this.cards = [];
+    this.limit = 3;
 
-    addCard() {
+    this.addCard = function () {
         if (this.cards.length < this.limit) {
             this.cards.push(userCard(this.cards.length + 1, this.name))
         } else {
             console.warn('You have more than 3 cards')
         }
-    }
+    }.bind(this)
 
-    getCardById(key) {
+    this.getCardById = function (key) {
         return this.cards[key - 1].getCardInformation()
-    }
+    }.bind(this)
 
-    logIn(name, password) {
+    this.logIn = function (name, password) {
         return name === this.name && password === this.password
-    }
+    }.bind(this)
 }
-
-// let card1 = userCard(1);
-
-// console.log(card1.getCardInformation())
-// card1.putCredits(50)
-// console.log(card1.getCardInformation())
-
-// let user = new UserAccount('Victor', 'qwerty123');
-// console.log(user)
-// user.addCard()
-// user.addCard()
-// user.addCard()
-// user.addCard()
-// console.log(user)
-// console.log(user.getCardById(2))
-// user.cards[1].takeCredits(40);
-// console.log(user.getCardById(2))
 
 $('#signIn').click(function () {
     $('.page').attr('data-hidden', 'true');
@@ -165,6 +147,7 @@ $('#registerBtn').click(function () {
             database.push(userCandidature);
             localStorage.database = JSON.stringify(database)
             activeAccount = database[database.length - 1];
+            activeAccount.id = database.length - 1;
             $('.page').attr('data-hidden', 'true');
             $('.mainPage').attr('data-hidden', 'false');
             clearInterval(x)
@@ -214,15 +197,75 @@ $('#logOutbtn').click(function () {
     $('.helloPage').attr('data-hidden', 'false');
 })
 
-$('#getMoneyBtn').click(function(){
-    let cardId = prompt('Input card id of card', 1);
+$('#getMoneyBtn').click(function () {
+    let cardId = parseInt(prompt('Input card id of card', 1));
     console.log(cardId)
-    for (let i = 0; i!== database.length; i++) {
+    for (let i = 0; i !== database.length; i++) {
         if (database[i] === activeAccount) {
-            console.log(database[i].cards[cardId].getCardInformation())
-            let limit = database[i].getCardById(1);
-            let amount = prompt(`Input the amount of credits to get. This card's limit is ${limit.transactionLimit}`, limit.transactionLimit)
-            database[i].cards[cardId].takeCredits(parseInt(amount))
+            if (cardId <= database[i].cards.length) {
+                let about = database[i].getCardById(cardId);
+                let amount = prompt(`Input the amount of credits to get. This card's limit is ${about.transactionLimit}`, about.transactionLimit)
+                if (amount < about.transactionLimit && about.balance - amount >= 0) {
+                    database[i].cards[cardId - 1].takeCredits(parseInt(amount))
+                    about = database[i].getCardById(cardId)
+                    alert(`Success! Your ballance on card ${cardId} is ${about.balance}`)
+                } else if (about.balance - amount <= 0){
+                    alert('No enough money')
+                } else {
+                    alert('Exceeded limit')
+                }
+            } else {
+                alert(`Card with id ${cardId} is not exist!`)
+            }
         }
     }
+    activeAccount = database[activeAccount.id - 1];
+})
+
+$('#putMoneyBtn').click(function () {
+    let cardId = parseInt(prompt('Input card id of card', 1));
+    for (let i = 0; i !== database.length; i++) {
+        if (database[i] === activeAccount) {
+            if (cardId <= database[i].cards.length) {
+                let about = database[i].getCardById(cardId);
+                let amount = prompt(`Input the amount of credits to put. This card's limit is ${about.transactionLimit}`, about.transactionLimit)
+                if (amount <= about.transactionLimit) {
+                    database[i].cards[cardId - 1].putCredits(parseInt(amount))
+                    about = database[i].getCardById(cardId)
+                    alert(`Success! Your ballance on card ${cardId} is ${about.balance}`)
+                } else {
+                    alert('Exceeded limit')
+                }
+            } else {
+                alert(`Card with id ${cardId} is not exist!`)
+            }
+        }
+    }
+    activeAccount = database[activeAccount.id - 1];
+})
+
+$('#transferBtn').click(function(){
+    let userName = prompt(`Ok ${activeAccount.name}, input the name of user to transfer the money`, activeAccount.name);
+    let finded = false;
+    let foundedUser = {};
+    let id = 0;
+    for (user of database) {
+        id++;
+        if (user.name === userName) {
+            finded = true;
+            foundedUser = user;
+            foundedUser.id = id;
+        }
+    }
+    if (finded) {
+        let cardId = parseInt(prompt(`To which ${foundedUser.name}'s card you want to transeft?\nHe(She) has got a ${foundedUser.cards.length} card(s)`, 1));
+        let usersCardId = parseInt(prompt(`From which your card you want to transeft?\nYou have got a ${activeAccount.cards.length} card(s)`, 1));
+        let myCard = database[activeAccount.id - 1].getCardById(cardId);
+        console.log(id)
+        let usersCard = database[foundedUser.id - 1].getCardById(usersCardId);
+        let summa = parseInt(prompt(`Ok. You choosed ${cardId} card.\n💰How much money do you want to transfer?\nNote: your transaction limit is ${myCard.transactionLimit}`, myCard.transactionLimit))
+    } else {
+        alert(`User with name ${userName} is not finded! Please check the name and try again.`)
+    }
+    activeAccount = database[activeAccount.id - 1];
 })
