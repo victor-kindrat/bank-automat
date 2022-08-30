@@ -309,12 +309,28 @@ $('#historyBtn').click(function () {
 
 $('#addNewCardBtn').click(function () {
     let id = activeAccount.id;
-    if (database[id].cards.length < this.limit) {
+    if (database[id].cards.length < database[id].limit) {
         database[id].addCard();
         alert(`👝 Success card ${database[id].cards.length} had been added to your account`)
     } else {
-        alert('You have more than 3 cards');
+        alert('You reached card-haveing limit');
     }
     activeAccount = database[id];
     activeAccount.id = id;
+})
+
+$('#changeLimitBtn').click(function(){
+    let cardId;
+    if (activeAccount.cards.length > 1) {
+        cardId = parseInt(prompt(`${activeAccount.name}, for which card you want to change transaction limit?`, 1))
+    } else {
+        cardId = 1
+    }
+    let amount = parseInt(prompt(`Amount of your new transaction limit`, 60))
+    if (amount >= 0) {
+        database[activeAccount.id].cards[cardId - 1].setTransactionLimit(amount);
+        alert(`Well done! Now your transaction limit on card ${cardId} is ${amount}`)
+    } else {
+        alert('You can\'t set transaction limit as a number below zero.')
+    }
 })
