@@ -210,7 +210,7 @@ $('#getMoneyBtn').click(function () {
                     database[i].cards[cardId - 1].takeCredits(parseInt(amount))
                     about = database[i].getCardById(cardId)
                     alert(`Success! Your ballance on card ${cardId} is ${about.balance}`)
-                } else if (about.balance - amount < 0){
+                } else if (about.balance - amount < 0) {
                     alert('No enough money')
                 } else {
                     alert('Exceeded limit')
@@ -249,7 +249,7 @@ $('#putMoneyBtn').click(function () {
     activeAccount.id = id
 })
 
-$('#transferBtn').click(function(){
+$('#transferBtn').click(function () {
     let userName = prompt(`Ok ${activeAccount.name}, input the name of user to transfer the money`, activeAccount.name);
     let finded = false;
     let foundedUser = {};
@@ -295,14 +295,26 @@ $('#transferBtn').click(function(){
     activeAccount.id = actid
 });
 
-$('#historyBtn').click(function(){
+$('#historyBtn').click(function () {
     toastList[0].show();
     $('.toast-body').empty();
     for (card of activeAccount.cards) {
         let cardInfo = card.getCardInformation();
-        for(historyLog of cardInfo.historyLogs) {
+        for (historyLog of cardInfo.historyLogs) {
             let hourly = new Date(historyLog.operationTime).toTimeString().slice(0, new Date(historyLog.operationTime).toTimeString().lastIndexOf(':'))
             $('.toast-body').prepend(`<div class="text fs-5"><span class="badge text-bg-primary">${new Date(historyLog.operationTime).toDateString()}, ${hourly}</span> - ${historyLog.operationType}, ${historyLog.credits}$ on card ${cardInfo.id}</div>`)
         }
     }
+})
+
+$('#addNewCardBtn').click(function () {
+    let id = activeAccount.id;
+    if (database[id].cards.length < this.limit) {
+        database[id].addCard();
+        alert(`👝 Success card ${database[id].cards.length} had been added to your account`)
+    } else {
+        alert('You have more than 3 cards');
+    }
+    activeAccount = database[id];
+    activeAccount.id = id;
 })

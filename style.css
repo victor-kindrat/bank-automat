@@ -102,6 +102,7 @@ div[data-hidden=true] {
   align-items: center;
   justify-content: flex-start;
   gap: 50px;
+  overflow: auto;
 }
 .wrap .mainPage .mainPage__head {
   width: 100%;
@@ -120,6 +121,8 @@ div[data-hidden=true] {
   padding: 10px 15px;
   font-size: 16px;
   line-height: 16px;
+  min-width: 100px;
+  flex-shrink: 1;
 }
 .wrap .mainPage .mainPage__body {
   width: 100%;
@@ -139,6 +142,8 @@ div[data-hidden=true] {
   align-items: center;
   justify-content: center;
   gap: 15px;
+  flex-wrap: wrap;
+  padding: 15px;
 }
 
 /*# sourceMappingURL=style.css.map */
