@@ -1,5 +1,4 @@
 let database = [];
-// JSON.parse(localStorage.getItem('database'))
 let activeAccount = {};
 let x;
 
@@ -22,19 +21,30 @@ function setMainPage(name) {
 function userCard(id, userName) {
     let balance = 100;
     let transactionLimit = 100;
-    let historyLogs = [];
     let owner = userName;
-
-    function recordOperation(type, value, time) {
-        historyLogs.push({
-            operationType: type,
-            credits: value,
-            operationTime: time
-        })
+    this.cardInformation = [];
+    let historyLogs = []
+    if (arguments.length >= 3) {
+        balance = arguments[2].balance || 100;
+        transactionLimit = arguments[2].transactionLimit || 100;
+        historyLogs = arguments[2].historyLogs || [];
     }
+    console.log(historyLogs)
+
+    // function 
 
     return {
+        historyLogs,
+        recordOperation(type, value, time) {
+            console.log(this);
+            this.historyLogs.push({
+                operationType: type,
+                credits: value,
+                operationTime: time
+            })
+        },
         getCardInformation() {
+            let historyLogs = this.historyLogs
             return {
                 id,
                 balance,
@@ -43,33 +53,39 @@ function userCard(id, userName) {
                 owner
             };
         },
+        recordCardInfo() {
+            this.cardInformation = this.getCardInformation();
+        },
         putCredits(amount) {
             if (amount <= transactionLimit) {
                 balance += amount;
-                recordOperation('Recieved credits', amount, new Date());
+                this.recordOperation('Recieved credits', amount, new Date());
             } else {
                 console.warn('Exceeded limit')
             }
+            this.recordCardInfo();
         },
         takeCredits(amount) {
             if (amount <= transactionLimit) {
                 if (balance - amount >= 0) {
                     balance -= amount;
-                    recordOperation('Taked credits', amount, new Date());
+                    this.recordOperation('Taked credits', amount, new Date());
                 } else {
                     console.warn('No enough money')
                 }
             } else {
                 console.warn('Exceeded limit')
             }
+            this.recordCardInfo();
         },
         setTransactionLimit(amount) {
             if (amount >= 0) {
                 transactionLimit = amount;
-                recordOperation('Change transaction limit', amount, new Date());
+                this.recordOperation('Change transaction limit', amount, new Date());
             } else {
                 console.warn('Your number is to low')
             }
+            this.recordCardInfo();
         },
         transferCredits(amount, card) {
             const tax = 0.005;
@@ -82,6 +98,8 @@ function userCard(id, userName) {
                     console.warn('Not enough money')
                 }
             }
+            this.recordCardInfo();
+            card.recordCardInfo();
         }
     }
 }
@@ -94,7 +112,8 @@ function UserAccount(name, password) {
 
     this.addCard = function () {
         if (this.cards.length < this.limit) {
-            this.cards.push(userCard(this.cards.length + 1, this.name))
+            this.cards.push(new userCard(this.cards.length + 1, this.name))
+            this.cards[this.cards.length - 1].cardInformation = this.cards[this.cards.length - 1].getCardInformation();
         } else {
             console.warn('You have more than 3 cards')
         }
@@ -108,6 +127,29 @@ function UserAccount(name, password) {
         return name === this.name && password === this.password
     }.bind(this)
 }
+
+function databaseConstructorFunc(dataArray) {
+    let database = [];
+    let dataList = dataArray;
+    for (data of dataList) {
+        let user = new UserAccount(data.name, data.password);
+        user.limit = data.limit;
+        user.cards = [];
+        for (card of data.cards) {
+            let theCard = new userCard(card.cardInformation.id, data.name, {
+                balance: card.cardInformation.balance,
+                transactionLimit: card.cardInformation.transactionLimit,
+                historyLogs: card.cardInformation.historyLogs,
+            });
+            theCard.cardInformation = card.cardInformation;
+            user.cards.push(theCard);
+        }
+        database.push(user);
+    }
+    return database;
+}
+
+database = databaseConstructorFunc(JSON.parse(localStorage.getItem('database')))
 
 $('#signIn').click(function () {
     $('.page').attr('data-hidden', 'true');
@@ -163,16 +205,18 @@ $('#registerBtn').click(function () {
 $('#loginBtn').click(function () {
     let exist = false;
     let user;
+    let activeId = 0;
     for (let i = 0; i !== database.length; i++) {
         if (database[i].name === $('#loginLogin').val()) {
             exist = true;
             user = database[i]
-            activeAccount.id = i + 1;
+            activeId = i;
         }
     }
     if (exist) {
         if (user.password === $('#loginPassword').val()) {
             activeAccount = user;
+            activeAccount.id = activeId;
             $('.page').attr('data-hidden', 'true');
             $('.mainPage').attr('data-hidden', 'false');
             clearInterval(x)
@@ -221,8 +265,9 @@ $('#getMoneyBtn').click(function () {
         }
     }
     let id = activeAccount.id;
-    activeAccount = database[id];
-    activeAccount.id = id
+    activeAccount = database[id - 1];
+    activeAccount.id = id;
+    localStorage.database = JSON.stringify(database)
 })
 
 $('#putMoneyBtn').click(function () {
@@ -245,8 +290,10 @@ $('#putMoneyBtn').click(function () {
         }
     }
     let id = activeAccount.id;
+    console.log(id)
     activeAccount = database[id];
-    activeAccount.id = id
+    activeAccount.id = id;
+    localStorage.database = JSON.stringify(database);
 })
 
 $('#transferBtn').click(function () {
@@ -291,8 +338,10 @@ $('#transferBtn').click(function () {
         alert(`User with name ${userName} is not finded! Please check the name and try again.`)
     }
     let actid = activeAccount.id;
-    activeAccount = database[activeAccount.id - 1];
-    activeAccount.id = actid
+    console.log(actid)
+    activeAccount = database[actid - 1];
+    activeAccount.id = actid;
+    localStorage.database = JSON.stringify(database);
 });
 
 $('#historyBtn').click(function () {
@@ -317,9 +366,10 @@ $('#addNewCardBtn').click(function () {
     }
     activeAccount = database[id];
     activeAccount.id = id;
+    localStorage.database = JSON.stringify(database);
 })
 
-$('#changeLimitBtn').click(function(){
+$('#changeLimitBtn').click(function () {
     let cardId;
     if (activeAccount.cards.length > 1) {
         cardId = parseInt(prompt(`${activeAccount.name}, for which card you want to change transaction limit?`, 1))
@@ -332,7 +382,8 @@ $('#changeLimitBtn').click(function(){
         alert(`Well done! Now your transaction limit on card ${cardId} is ${amount}`)
     } else {
         alert('You can\'t set transaction limit as a number below zero.')
-    }
+    };
+    localStorage.database = JSON.stringify(database);
 })
 
 $('#checkBalanceBtn').click(function () {
@@ -344,8 +395,12 @@ $('#checkBalanceBtn').click(function () {
     }
     for (data of database) {
         if (data.name === activeAccount.name) {
-            let info = data.getCardById(cardId);
-            alert(`🤑 Your balance is: ${info.balance}$`)
+            if (cardId <= activeAccount.cards.length) {
+                let info = data.getCardById(cardId);   
+                alert(`🤑 Your balance is: ${info.balance}$`)
+            } else {
+                alert(`😐 You haven't got a card with id ${cardId}`)
+            }
         }
     }
 })
