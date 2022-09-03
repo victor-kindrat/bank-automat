@@ -334,3 +334,18 @@ $('#changeLimitBtn').click(function(){
         alert('You can\'t set transaction limit as a number below zero.')
     }
 })
+
+$('#checkBalanceBtn').click(function () {
+    let cardId;
+    if (activeAccount.cards.length > 1) {
+        cardId = parseInt(prompt(`${activeAccount.name}, which card balance do you want to watch?`, 1))
+    } else {
+        cardId = 1
+    }
+    for (data of database) {
+        if (data.name === activeAccount.name) {
+            let info = data.getCardById(cardId);
+            alert(`🤑 Your balance is: ${info.balance}$`)
+        }
+    }
+})
