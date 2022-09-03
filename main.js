@@ -149,7 +149,7 @@ function databaseConstructorFunc(dataArray) {
     return database;
 }
 
-database = databaseConstructorFunc(JSON.parse(localStorage.getItem('database')))
+database = databaseConstructorFunc(JSON.parse(localStorage.getItem('database')) || [])
 
 $('#signIn').click(function () {
     $('.page').attr('data-hidden', 'true');
